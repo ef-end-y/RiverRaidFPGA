@@ -70,12 +70,12 @@ typedef struct {
 } rom_sprites_t;
 
 typedef struct {
-    logic [3:0]     ship_rgb;
-    logic [3:0]     plane_rgb;
-    logic [3:0]     helicopter_rgb;
-    logic [3:0]     building_rgb;
-    logic [3:0]     fuel_rgb;
-    logic [3:0]     player_rgb;
+    logic [3:0]     ship;
+    logic [3:0]     plane;
+    logic [3:0]     helicopter;
+    logic [3:0]     building;
+    logic [3:0]     fuel;
+    logic [3:0]     player;
 } rgb_sprites_t;
 
 typedef struct {
@@ -161,11 +161,11 @@ module draw_sprites (
             else if( entities[i].show && `POINT_IN_BOX(screen, entities[i]) )
               begin
                 case( entities[i].etype )
-                    SHIP:       `ROM_RGB(rom_sprites.ship_addr, game.rgb_sprites.ship_rgb, 7, entities[i])
-                    BUILDING:   `ROM_RGB(rom_sprites.building_addr, game.rgb_sprites.building_rgb, 6, entities[i])
-                    PLANE:      `ROM_RGB(rom_sprites.plane_addr, game.rgb_sprites.plane_rgb, 7, entities[i])
-                    HELICOPTER: `ROM_RGB(rom_sprites.helicopter_addr, game.rgb_sprites.helicopter_rgb, 6, entities[i])
-                    FUEL:       `ROM_RGB(rom_sprites.fuel_addr, game.rgb_sprites.fuel_rgb, 6, entities[i])
+                    SHIP:       `ROM_RGB(rom_sprites.ship_addr, game.rgb_sprites.ship, 7, entities[i])
+                    BUILDING:   `ROM_RGB(rom_sprites.building_addr, game.rgb_sprites.building, 6, entities[i])
+                    PLANE:      `ROM_RGB(rom_sprites.plane_addr, game.rgb_sprites.plane, 7, entities[i])
+                    HELICOPTER: `ROM_RGB(rom_sprites.helicopter_addr, game.rgb_sprites.helicopter, 6, entities[i])
+                    FUEL:       `ROM_RGB(rom_sprites.fuel_addr, game.rgb_sprites.fuel, 6, entities[i])
                     BRIDGE:     rgb <=  entities[i].die_step[1]? 4'b000 :
                                         ((screen.y - entities[i].y) > (`BRIDGE_HEIGHT/2-3) &&
                                         (screen.y - entities[i].y) < (`BRIDGE_HEIGHT/2+3)) ? 4'b0110 : 4'b1000;
@@ -208,7 +208,7 @@ module draw_player (
         if( `POINT_IN_BOX(screen, game.player_box) )
           begin
             player_addr = ((screen.y-game.player_box.y) << 6) + (screen.x - game.player_box.x);
-            rgb <= game.player_box.die_step[1]? 4'b000 : game.rgb_sprites.player_rgb;
+            rgb <= game.player_box.die_step[1]? 4'b000 : game.rgb_sprites.player;
           end
         else
           begin
@@ -689,17 +689,17 @@ module init (
     always @(posedge clk)
     if( !rst )
       begin
-        river_flow              <= `RIVER_FLOW;
-        island_flow             <= `ISLAND_FLOW;
-        entity_flow             <= `ENTITY_FLOW;
-        sprites.missile         <= `MISSILE_SPRITE;
+        river_flow          <= `RIVER_FLOW;
+        island_flow         <= `ISLAND_FLOW;
+        entity_flow         <= `ENTITY_FLOW;
+        sprites.missile     <= `MISSILE_SPRITE;
       end
 endmodule
 
 
 
 module RiverRaid (
-    input           clk,
+    input           clk,  // 50 Mhz
     input           rst,
     input           ps2_clk,
     input           ps2_data,
@@ -761,41 +761,41 @@ module RiverRaid (
         .pixel_y            ( screen.y          )
     );
 
-    sprites (
+    sprite_ship (
         .clock              ( vga_clk                           ),
         .address            ( game.rom_sprites.ship_addr        ),
-        .q                  ( game.rgb_sprites.ship_rgb         )
+        .q                  ( game.rgb_sprites.ship             )
     );
 
     sprite_plane (
         .clock              ( vga_clk                           ),
         .address            ( game.rom_sprites.plane_addr       ),
-        .q                  ( game.rgb_sprites.plane_rgb        )
+        .q                  ( game.rgb_sprites.plane            )
     );
     
     sprite_helicopter (
         .clock              ( vga_clk                           ),
         .address            ( game.rom_sprites.helicopter_addr  ),
-        .q                  ( game.rgb_sprites.helicopter_rgb   )
+        .q                  ( game.rgb_sprites.helicopter       )
     );
 
 
     sprite_building (
         .clock              ( vga_clk                           ),
         .address            ( game.rom_sprites.building_addr    ),
-        .q                  ( game.rgb_sprites.building_rgb     )
+        .q                  ( game.rgb_sprites.building         )
     );
 
     sprite_fuel (
         .clock              ( vga_clk                           ),
         .address            ( game.rom_sprites.fuel_addr        ),
-        .q                  ( game.rgb_sprites.fuel_rgb         )
+        .q                  ( game.rgb_sprites.fuel             )
     );
 
     sprite_player (
         .clock              ( vga_clk                           ),
         .address            ( game.player.sprite_addr           ),
-        .q                  ( game.rgb_sprites.player_rgb       )
+        .q                  ( game.rgb_sprites.player           )
     );
 
     play (
@@ -845,14 +845,14 @@ module RiverRaid (
                 case( ps2_received_data )
                     8'h6B : if( game.cmd.movement < 0 ) game.cmd.movement <= 0;
                     8'h74 : if( game.cmd.movement > 0 ) game.cmd.movement <= 0;
-                    8'h75 : game.cmd.shot       <=  0;
+                    8'h29 : game.cmd.shot       <=  0;
                     8'h72 : game.cmd.slow       <=  0;
                 endcase
            else begin   
                 case( ps2_received_data )
                     8'h6B : game.cmd.movement   <= -`PLAYER_SPEED;
                     8'h74 : game.cmd.movement   <=  `PLAYER_SPEED;
-                    8'h75 : game.cmd.shot       <=  1;
+                    8'h29 : game.cmd.shot       <=  1;
                     8'h72 : game.cmd.slow       <=  1;
                 endcase
             end

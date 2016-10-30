@@ -7,9 +7,9 @@
 
 // Количество объектов в массиве берегов, островов и врагов
 // Выставлять соответственно кол-ву элементов в RIVER_FLOW, ISLAND_FLOW и ENTITY_FLOW
-`define RIVER_FLOW_SIZE			58
+`define RIVER_FLOW_SIZE			66
 `define ISLAND_FLOW_SIZE		24
-`define ENTITY_FLOW_SIZE		46
+`define ENTITY_FLOW_SIZE		47
 
 
 // Параметры для VGA генератора
@@ -161,6 +161,14 @@ typedef enum {
 	'{'d10300,		-'d1	},\
 	'{'d10310,		-'d2	},\
 	'{'d10320,		'd0		},\
+	'{'d11000,		'd1		},\
+	'{'d11010,		'd2		},\
+	'{'d11020,		'd3		},\
+	'{'d11040,		'd0		},\
+	'{'d11050,		-'d3	},\
+	'{'d11060,		-'d2	},\
+	'{'d11070,		-'d1	},\
+	'{'d11080,		'd0		},\
 	'{24'hffffff,	'd0		}\
 }
 
@@ -198,7 +206,7 @@ typedef enum {
 	'{'d840,		HELICOPTER,	'd790,	-'d2	},\
 	'{'d1100,		SHIP,		'd630,	'd9		},\
 	'{'d1450,		SHIP,		'd810,	'd1		},\
-	'{'d1522,		BUILDING,	'd610,	'd0		},\
+	'{'d1525,		BUILDING,	'd610,	'd0		},\
 	'{'d1755,		PLANE,		'd50,	'd16	},\
 	'{'d2050,		SHIP,		'd700,	'd3		},\
 	'{'d2250,		BRIDGE,		'd0,	'd0		},\
@@ -234,6 +242,7 @@ typedef enum {
 	'{'d8090,		SHIP,		'd350,	'd0		},\
 	'{'d8270,		HELICOPTER,	'd200,	-'d12	},\
 	'{'d8460,		HELICOPTER,	'd900,	'd12	},\
+	'{'d8650,		FUEL,		'd100,	'd0		},\
 	'{'d9400,		FUEL,		'd610,	'd0		},\
 	'{'d9500,		HELICOPTER,	'd580,	'd0		},\
 	'{'d9560,		HELICOPTER,	'd630,	'd0		},\
